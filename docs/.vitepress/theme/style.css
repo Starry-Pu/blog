@@ -1,0 +1,113 @@
+/* docs/.vitepress/theme/style.css */
+
+/* =========================================
+   1. 全站通用样式基础设置
+========================================= */
+
+.VPContent {
+  /* 【修改点】删除了之前的网格背景代码 */
+  background: transparent; 
+}
+
+.vp-doc h1 {
+  background: -webkit-linear-gradient(120deg, #bd34fe 30%, #41d1ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent; 
+  font-weight: bold;
+  padding-bottom: 10px;
+}
+
+/* 文章内的普通图片 */
+.vp-doc img {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -10px rgba(124, 58, 237, 0.3);
+  transition: transform 0.3s;
+}
+.vp-doc img:hover {
+  transform: scale(1.02);
+}
+
+.vp-doc a {
+  color: #bd34fe;
+  font-weight: 500;
+  text-decoration: none;
+}
+.vp-doc a:hover {
+  color: #41d1ff;
+  text-decoration: underline;
+}
+
+
+/* =========================================
+   2. 顶部导航栏 Logo 特效 (核弹级修复版)
+========================================= */
+
+.VPNavBar, .VPNavBarTitle, .VPNavBarTitle .title {
+  overflow: visible !important;
+  z-index: 100 !important;
+}
+
+.VPNavBarTitle .title {
+  display: flex !important; 
+  flex-direction: row-reverse !important; 
+  align-items: center !important;
+}
+
+.VPNavBarTitle .logo {
+  margin-left: 12px !important; 
+  margin-right: 0 !important;
+  border-radius: 50%;
+  height: 40px !important; 
+  width: 40px !important;
+  border: 2px solid rgba(189, 52, 254, 0.3);
+  box-shadow: 0 0 10px rgba(189, 52, 254, 0.2);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  z-index: 1;
+}
+
+.VPNavBarTitle .logo:hover {
+  transform: scale(1.2) rotate(12deg); 
+  box-shadow: 0 0 20px rgba(65, 209, 255, 0.8);
+  border-color: #41d1ff;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.VPNavBarTitle .logo:active {
+  transform: scale(2.2) rotate(-20deg) !important;
+  box-shadow: 0 0 60px rgba(189, 52, 254, 1); 
+  border-color: #bd34fe;
+  z-index: 99999 !important;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+}
+
+
+/* =========================================
+   3. 【新】关于我页面 - 大头像专属特效
+========================================= */
+
+.super-bounce {
+  border-radius: 50% !important; 
+  border: 4px solid rgba(189, 52, 254, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  position: relative;
+  z-index: 10;
+}
+
+.super-bounce:hover {
+  transform: scale(1.05) rotate(3deg);
+  border-color: #41d1ff;
+  box-shadow: 0 0 30px rgba(65, 209, 255, 0.5);
+}
+
+.super-bounce:active {
+  transform: scale(1.5) rotate(-10deg); 
+  box-shadow: 0 0 80px rgba(189, 52, 254, 0.8);
+  border-color: #bd34fe;
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+  z-index: 9999;
+}
