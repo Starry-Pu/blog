@@ -2,6 +2,10 @@
 # 页面布局：主页
 layout: home
 
+# 【关键改动1】给首页加一个专属的 CSS 类名
+# 这样我们的样式就只会在首页生效，不会影响其他页面
+pageClass: home-hide-nav
+
 # 首页的大标题设置
 hero:
   name: "Pustarry 的小站"
@@ -22,6 +26,9 @@ features:
   - title: 🐱 关于我
     details: 不止是代码。了解在这个博客背后的我。
     link: /about
+
+# 开启页脚
+footer: true
 ---
 
 <style>
@@ -45,10 +52,7 @@ features:
 
 /* =========================================
    核心大招：潜意识微流光 (Subliminal Flow)
-   方向：从左 -> 右
-   质感：极限淡雅，只有淡淡的一点点
 ========================================= */
-
 .VPHomeHero::before {
   content: '';
   position: absolute;
@@ -60,42 +64,22 @@ features:
   width: 100vw;
   height: 100vh;
   
+  /* 这里已经修复了乱码空格 */
   background-image: 
-    /* 第1层：高光 (青色) - 透明度降至 0.03 (3%) */
     linear-gradient(110deg, transparent 30%, rgba(34, 211, 238, 0.03) 50%, transparent 70%),
-    /* 第2层：主洋流 (紫色) - 透明度降至 0.02 (2%) */
     linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.02) 50%, transparent 100%),
-    /* 第3层：深海底 (深蓝) - 透明度降至 0.01 (1%) */
     linear-gradient(130deg, transparent 0%, rgba(59, 130, 246, 0.01) 60%, transparent 100%);
     
-  background-size: 
-    200% 100%, 
-    200% 100%, 
-    200% 100%;
-    
-  /* 稍微增加一点模糊，让这微弱的光更均匀 */
+  background-size: 200% 100%, 200% 100%, 200% 100%;
   filter: blur(50px);
-  
   background-blend-mode: screen;
   pointer-events: none;
-  
-  /* 动画：向右缓缓流动 */
   animation: left-to-right-flow 12s linear infinite;
 }
 
 @keyframes left-to-right-flow {
-  0% {
-    background-position: 
-      200% 0%, 
-      150% 0%, 
-      100% 0%; 
-  }
-  100% {
-    background-position: 
-      0% 0%, 
-      0% 0%,     
-      0% 0%;     
-  }
+  0% { background-position: 200% 0%, 150% 0%, 100% 0%; }
+  100% { background-position: 0% 0%, 0% 0%, 0% 0%; }
 }
 
 /* --- 3. 底部卡片微调 --- */
@@ -104,11 +88,15 @@ features:
   transition: all 0.3s ease;
   background-color: rgba(255,255,255,0.02) !important;
 }
-
 .VPFeature:hover {
   transform: translateY(-5px);
-  /* 悬停边框也降到了极低 */
   border-color: rgba(139, 92, 246, 0.15) !important;
   background-color: rgba(255,255,255,0.05) !important;
+}
+
+/* --- 4. 【关键改动2】只在特定页面隐藏导航 --- */
+/* 注意：这里加了 .home-hide-nav 前缀 */
+.home-hide-nav .VPNavBarMenu {
+  display: none !important;
 }
 </style>
