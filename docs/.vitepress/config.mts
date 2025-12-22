@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   // 浏览器标签页上显示的标题
+  base: '/blog/',
   title: "Pu Starry的小站",
   description: "记录 学习 与生活",
 
