@@ -3,105 +3,178 @@ title: 我的项目
 editLink: true
 ---
 
+<script setup>
+import { ref } from 'vue'
+
+// 控制当前显示哪个项目的 Key
+const activeProject = ref('mini') // 默认显示小程序
+
+const projects = [
+  { key: 'mini', label: '闲置小程序' },
+  { key: 'edu', label: '教育平台' },
+  { key: 'web', label: '官网优化' }
+]
+</script>
+
 # 🛠️ 我的项目 (Projects)
 
-这里会一些记录我在工作中遇到的难题，解决方案及核心项目，以及业余时间为了解决实际问题而开发的工具。
+这里记录我在工作中遇到的硬核难题、解决方案及复盘。
 
 ---
 
-## 💻 工作项目复盘
+##  项目复盘 (点击切换)
 
-### 1. 在线教育平台 - 核心交互重构
-
-<div style="display: flex; gap: 10px; margin-bottom: 16px;">
-  <img src="https://img.shields.io/badge/Vue-2.x-green" alt="Vue2" />
-  <img src="https://img.shields.io/badge/Element-UI-blue" alt="Element UI" />
-  <img src="https://img.shields.io/badge/重构-Refactor-orange" alt="Refactor" />
+<div class="project-tabs">
+  <button 
+    v-for="p in projects" 
+    :key="p.key"
+    class="tab-btn" 
+    :class="{ active: activeProject === p.key }"
+    @click="activeProject = p.key"
+  >
+    {{ p.label }}
+  </button>
 </div>
 
-**📝 项目背景：**
-这是一个业务逻辑很重的课程管理系统。接手时，项目因为历史遗留代码过多，导致维护成本极高，尤其是“课程配置”模块，涉及多层弹窗嵌套和复杂的表单联动。
+<div v-if="activeProject === 'mini'" class="project-content fade-in">
+  <h3>蘑菇宅急便 - 留学生二手交易小程序</h3>
+  
+  <div class="badge-container">
+    <img src="https://img.shields.io/badge/React-Hooks-blue" />
+    <img src="https://img.shields.io/badge/Taro-CrossPlatform-orange" />
+    <img src="https://img.shields.io/badge/TypeScript-Strict-blue" />
+  </div>
 
-**🚩 面临的问题：**
+  **项目背景：**
+  为了解决瑞典留学生微信群消息刷屏导致“好物漏看”的问题，我独立开发了这个闲置流转平台。前端基于 Taro + React，后端利用 Node.js 转发配合云开发。
 
-::: details 点击展开查看具体痛点
-* **数据回显异常**：在弹窗（Dialog）嵌套弹窗的场景下，后端返回数据后，`el-form` 经常无法正确回填，或者校验规则失效。
-* **用户体验卡顿**：由于大量逻辑写在 `updated` 钩子里，导致页面输入时会有明显的延迟感。
-* **代码难以维护**：表单逻辑和业务逻辑由于强耦合，改一个字段往往会引发连锁 Bug。
-:::
+  ::: details  **遇到的痛点 (The Pain)**
+  * **列表卡顿**：瀑布流图片密集，列表滑动帧率跌破 **30fps**，手机发烫。
+  * **体积超标**：主包体积临近小程序 **2MB** 限制，无法发布。
+  * **弱网噩梦**：瑞典信号不稳定，图片上传经常失败，表单数据丢失。
+  :::
 
-**💡 我的解决方案：**
-
-::: details 点击查看技术解决细节
-**1. 从源码层面解决回显 Bug**
-排查发现简单的 `this.form = data` 无法触发深层组件更新。我查阅了 **Element UI 源码** 中关于 `el-form` 的验证机制，配合 Vue 的 `nextTick` 和 `v-if` 重绘策略，彻底解决了异步数据渲染的时序问题。
-
-**2. Axios 拦截器封装**
-为了解决接口偶尔超时的问题，我没有在每个页面写 `try-catch`，而是重写了 Axios 的响应拦截器。实现了**无感 Token 刷新**和**请求自动重试机制**（对 5xx 错误自动重试 3 次），统一了全站的异常处理标准。
-:::
-
-**✅ 最终结果：**
-* 核心模块的 Bug 反馈率下降了约 60%。
-* 团队其他成员在接入新表单时，开发效率明显提升。
-
-
----
-
-### 2. 企业级官网 - 性能优化专项
-
-<div style="display: flex; gap: 10px; margin-bottom: 16px;">
-  <img src="https://img.shields.io/badge/Vue-3.x-green" alt="Vue3" />
-  <img src="https://img.shields.io/badge/性能-优化-red" alt="Performance" />
+  ::: details  **我的解决手段 (The Fix)**
+  * **虚拟滚动 (Virtual List)**：手写计算逻辑，配合 `setData` 差量更新，仅渲染可视区节点，帧率回升至 **55fps+**。
+  * **极限瘦身**：采用**分包 (Subpackages)** 策略拆分非核心页面；剥离冗余库，主包控制在 **1.5MB**。
+  * **抗弱网 Hook**：封装 `useUpload`，支持断网重试 (Retry) 和 `localStorage` 本地暂存，TTI 优化至 **1.2s**。
+  :::
 </div>
 
-**📝 项目背景：**
-公司旧版官网首屏加载时间长达 8 秒，跳出率很高。我的目标是将首屏时间控制在 2 秒以内。
+<div v-if="activeProject === 'edu'" class="project-content fade-in">
+  <h3>在线教育平台 - 核心交互重构</h3>
 
-**🚩 面临的挑战：**
+  <div class="badge-container">
+    <img src="https://img.shields.io/badge/Vue-2.x-green" />
+    <img src="https://img.shields.io/badge/Element-UI-blue" />
+    <img src="https://img.shields.io/badge/Refactor-重构-red" />
+  </div>
 
-::: details 点击展开查看具体性能瓶颈
-* **加载缓慢**：旧版网站代码冗余严重，首屏加载时间过长，导致用户流失。
-* **转化率低**：页面布局不合理，用户难以找到核心入口。
-:::
+  **项目背景：**
+  接手了一个历史包袱很重的课程管理系统，核心的“课程配置”模块存在多层弹窗嵌套，维护成本极高。
 
-**🔧 关键技术动作：**
+  ::: details  **遇到的痛点 (The Pain)**
+  * **幽灵回显**：Dialog 嵌套 Dialog 场景下，数据回填慢半拍，校验规则失效（竞态问题）。
+  * **接口不可靠**：偶发 5xx 错误或 Token 过期，用户被迫频繁重新登录。
+  :::
 
-::: details 点击查看具体优化手段
-**1. 体积优化 (Bundle Size)**
-通过 `webpack-bundle-analyzer` 分析，发现首屏加载了大量未使用的组件。我配置了**路由懒加载 (Lazy Loading)**，并将 Element Plus 组件库改为**按需引入**，将首屏包体积减少了 60%。
+  ::: details  **我的解决手段 (The Fix)**
+  * **精准时序**：配合 `nextTick` + `v-if` 强制重绘组件，确保 DOM 更新后再赋值，彻底解决竞态 Bug。
+  * **Axios 兜底**：重写拦截器，实现 **无感 Token 刷新** 和 **错误自动重试 (Retry x3)**，将异常拦截在底层。
+  :::
+</div>
 
-**2. 静态资源加速**
-将所有图片资源转换为 WebP 格式，并配置 CDN 缓存策略。对于大图，采用了“渐进式加载”方案，提升视觉体验。
-:::
+<div v-if="activeProject === 'web'" class="project-content fade-in">
+  <h3>企业官网 - 极致性能优化</h3>
 
-**✅ 最终结果：**
-* **LCP (最大内容渲染)** 时间从 8s 降低至 1.8s。
-* 配合运营部门进行 A/B 测试，调整 CTA 按钮位置，最终转化率提升了 15%。
+  <div class="badge-container">
+    <img src="https://img.shields.io/badge/Vue-3-green" />
+    <img src="https://img.shields.io/badge/Vite-Fast-purple" />
+    <img src="https://img.shields.io/badge/Performance-优化-orange" />
+  </div>
 
-**后面会持续更新...**
+  **项目背景：**
+  旧版官网首屏加载超过 3秒，且在 iOS Safari 12 等旧设备上白屏。目标是将首屏压进 1.5秒。
+
+  ::: details  **遇到的痛点 (The Pain)**
+  * **加载缓慢**：首屏加载了大量未使用的组件和未压缩图片。
+  * **兼容性差**：旧版浏览器不支持 ES6+ 新语法，直接白屏。
+  :::
+
+  ::: details  **我的解决手段 (The Fix)**
+  * **代码减肥**：配置路由懒加载 + Element Plus 按需引入，体积减少 60%。
+  * **资源加速**：全站 WebP + Gzip + CDN 缓存策略。
+  * **Polyfill**：注入 Legacy 插件解决 Safari 12 白屏问题。
+  :::
+</div>
 
 ---
 
 ## 🔧 个人开源 / 练手
 
-工作之余，我更喜欢写一些能“偷懒”的小工具，或者用来验证新技术的 Demo。
+工作之余，我更喜欢写一些能“偷懒”的小工具。
 
-| 项目名称 | 碎碎念 (Why I built this) | 技术栈 | 源码 |
-| :--- | :--- | :--- | :--- |
-| **PuStarry Blog** | **(就是本站)** <br> 想把自己在工作中还有生活中的一些趣事分享出来。为了**专注写作**，折腾了很久 VitePress，最终实现了“写完 Markdown 往 GitHub 一推就发布”的懒人流。 | `VitePress` `Vue3` `GitHub Actions` | [GitHub](https://github.com/Starry-Pu) |
-| **蘑菇宅急便** <br> *(微信小程序)* | **(实战练兵)** <br> 这是一个专为**瑞典留学生**打造的闲置二手交易平台，旨在解决微信群消息刷屏导致好物被漏看的问题。为了**跳出 Vue 的舒适区**，我特意选择了 **Taro** 框架，强迫自己用 **React** 语法重构业务逻辑。后端配合**云开发**，一个人低成本搞定全栈。 | `Taro` `React` `微信云开发` | [开发中...] |
+| 项目名称 | 碎碎念 (Why I built this) | 源码 |
+| :--- | :--- | :--- |
+| **PuStarry Blog** | **(就是本站)** <br> 懒人流博客，写完 Markdown 推送 GitHub 自动发布。 | [GitHub](https://github.com/Starry-Pu) |
+| [微孔板标记小工具](https://microplate-marking-tool.pages.dev) | **(解决痛点)**<br>可视化 **96 孔板标色工具**，支持自定义标记并一键导出图片。 | [GitHub](https://github.com/Starry-Pu/Microplate-Marking-Tool) |
 
 ---
 
 ## 🚦 待办计划 (Roadmap)
+待更...
+<style>
+.project-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--vp-c-divider);
+  padding-bottom: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
 
-在这里立几个 Flag，督促自己不要做“思想上的巨人，行动上的矮子”。
+.tab-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 纯文字时居中更好看 */
+  font-size: 14px;
+  flex-shrink: 0;
+}
 
-- [ ] 📖 **撰写《机械转码五年》**
-    整理自己从“拧螺丝”到“写代码”的转型之路。不写鸡汤，只写那些深夜 Debug 的真实崩溃和非科班的生存经验，送给同样的后来人。
-- [ ] 📸 **猫咪瀑布流相册**
-    给家里的主子做一个专属网站。可能会尝试接入 **Three.js**，做一个 3D 的猫抓板交互效果（毕竟它在这个家地位最高）。
-- [ ] ⚛️ **Next.js 全栈记账本**
-    VitePress 虽然香，但为了保持对 **SSR** 技术栈的敏感度，计划用 Next.js 14 + Prisma 手撸一个极其简单的记账工具，解决自己“钱不知道花哪去”的痛点。
+.tab-btn:hover {
+  background-color: var(--vp-c-bg-mute);
+  color: var(--vp-c-brand);
+}
 
----
+.tab-btn.active {
+  background-color: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand);
+  border-color: var(--vp-c-brand);
+}
+
+.badge-container {
+  display: flex; 
+  gap: 6px; 
+  margin-bottom: 10px; 
+  flex-wrap: wrap;
+}
+
+/* 简单的淡入动画 */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
